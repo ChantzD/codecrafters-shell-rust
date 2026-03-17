@@ -2,7 +2,10 @@
 use std::io::{self, Write};
 
 fn main() {
-    // TODO: Uncomment the code below to pass the first stage
+    let mut input = String::new();
     print!("$ ");
-    io::stdout().flush().unwrap();
+    // Need to flush buffer to print $ immediately
+    io::stdout().flush().expect("Failed to flush");
+    io::stdin().read_line(&mut input).expect("Failed to read line");
+    println!("{}: command not found", input.trim());
 }
