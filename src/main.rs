@@ -17,5 +17,17 @@ fn read() -> String {
 }
 
 fn eval(input : String){
-    println!("{}: command not found", input);
+    // as ref needed because input becomes &'str???
+    match input.as_ref() {
+        "exit" => { exit_builtin();
+        },
+        _ => {
+            println!("{}: command not found", input);
+        }
+
+    }
+}
+
+fn exit_builtin() {
+    std::process::exit(0);
 }
