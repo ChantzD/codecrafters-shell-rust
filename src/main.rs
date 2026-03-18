@@ -4,7 +4,6 @@ use std::io::{self, Write};
 
 fn main() {
     loop {
-        let inbuilt_commands = ["echo", "exit", "type"];
         print!("$ ");
         eval(read());
     }
@@ -25,6 +24,16 @@ fn eval(input : String){
         "exit" => { exit_builtin();
         },
         "echo" => {echo_builtin(inputs)},
+        "type" => {if let Some(input) = inputs.get(1){
+            if type_builtin(input){
+                println!("{} is a shell builtin", input);}
+            else {
+                println!("{}: not found", input);
+            }
+
+        } else {
+            println!("Type input not found");
+        }}
         _ => {
             println!("{}: command not found", input);
         }
@@ -46,6 +55,6 @@ fn echo_builtin(inputs : Vec<&str>) {
 }
 
 fn type_builtin(input : &str) -> bool {
-    let inbuilt_commands = [*"echo", *"exit", *"type"];
-    return inbuilt_commands.contains(input);
+    let inbuilt_commands = ["echo", "exit", "type"];
+    return inbuilt_commands.contains(&input);
 }
