@@ -1,5 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::fs;
+use is_executable::IsExecutable;
 
 
 fn main() {
@@ -23,17 +25,8 @@ fn eval(input : String){
     match inputs[0].as_ref() {
         "exit" => { exit_builtin();
         },
-        "echo" => {echo_builtin(inputs)},
-        "type" => {if let Some(input) = inputs.get(1){
-            if type_builtin(input){
-                println!("{} is a shell builtin", input);}
-            else {
-                println!("{}: not found", input);
-            }
-
-        } else {
-            println!("Type input not found");
-        }}
+        "echo" => {echo_builtin(inputs);},
+        "type" => {let _ = type_builtin(inputs);},
         _ => {
             println!("{}: command not found", input);
         }
@@ -54,7 +47,34 @@ fn echo_builtin(inputs : Vec<&str>) {
     }
 }
 
-fn type_builtin(input : &str) -> bool {
+fn type_builtin(inputs : Vec<&str>) -> io::Result<()> {
+    // Check if the command is builtin
     let inbuilt_commands = ["echo", "exit", "type"];
-    return inbuilt_commands.contains(&input);
+    if let Some(input) = inputs.get(1){
+        if inbuilt_commands.contains(&input){
+            println!("{} is a shell builtin", input);}
+        else {
+            // Check if there is an external command
+            match env::var_os("PATH"){
+                Some(paths) => {
+                    for path in env::split_paths(&paths) {
+                        for entry in fs::read_dir(&path)?{
+                            let entry = entry?;
+                            let entry_path = entry.path();
+                            if entry_path.is_file() && entry_path.file_name().map_or(false, |name| name == *input) && entry_path.is_executable() {
+                                println!("{} is {}", input, entry_path.display());
+                                return Ok(());
+                                //Ok::<(), E>(());
+                            }
+
+                        }
+                    }
+
+                }
+            None => {println!("Could not determine PATH");}
+            }
+            println!("{}: not found", input);
+        }
+    }
+    Ok(())
 }
