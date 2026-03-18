@@ -1,8 +1,10 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
+
 fn main() {
     loop {
+        let inbuilt_commands = ["echo", "exit", "type"];
         print!("$ ");
         eval(read());
     }
@@ -41,4 +43,9 @@ fn echo_builtin(inputs : Vec<&str>) {
     } else {
         println!("");
     }
+}
+
+fn type_builtin(input : &str) -> bool {
+    let inbuilt_commands = [*"echo", *"exit", *"type"];
+    return inbuilt_commands.contains(input);
 }
