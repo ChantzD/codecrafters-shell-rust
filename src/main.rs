@@ -17,10 +17,12 @@ fn read() -> String {
 }
 
 fn eval(input : String){
+    let inputs: Vec<&str> = input.split_whitespace().collect();
     // as ref needed because input becomes &'str???
-    match input.as_ref() {
+    match inputs[0].as_ref() {
         "exit" => { exit_builtin();
         },
+        "echo" => {echo_builtin(inputs)},
         _ => {
             println!("{}: command not found", input);
         }
@@ -30,4 +32,13 @@ fn eval(input : String){
 
 fn exit_builtin() {
     std::process::exit(0);
+}
+
+fn echo_builtin(inputs : Vec<&str>) {
+    if let Some((_head, tail)) = inputs.split_first() {
+        // .join because &str cant be printed???
+        println!("{}", tail.join(" "));
+    } else {
+        println!("");
+    }
 }
